@@ -17,7 +17,10 @@ class Uploader:
         quota_validation_url,
         history_url,
         status="Idle",
-        icon="default.png"
+        icon="default.png",
+        registration_url=None,
+        auth_token=None,
+        auth_tenant_id=None
     ):
 
         self.app_id = app_id
@@ -32,11 +35,15 @@ class Uploader:
         self.root_url = os.getenv("APP_BASE_PATH") + os.getenv("APP_URL_PREFIX") + '/uploads'
         self.status = status
         self.icon = icon
+    
+        self.registration_url = registration_url or f'{os.getenv("REGISTRY_SERVICE_URL")}/uploaders'
+        self.auth_token = auth_token or os.getenv('AUTH_TOKEN')
+        self.auth_tenant_id = auth_tenant_id or os.getenv('AUTH_TENANT_ID')
 
 
     def register_uploader(self):
 
-        if 'true' not in os.getenv('APP_AUTHENTICATED', 'false'):
+        if 'true' != os.getenv('APP_AUTHENTICATED'):
             logging.warning('Uploader not registered, no auth token available')
             return False
 
@@ -58,16 +65,14 @@ class Uploader:
         }
 
         logging.warning(payload)
-
-        url = f'{os.getenv("REGISTRY_SERVICE_URL")}/uploaders'
         
+
         headers = {
-            "Authorization": os.getenv('AUTH_TOKEN'), 
-            "TenantId": os.getenv('AUTH_TENANT_ID'),
-            "Accept": "application/json"
+            "Authorization": self.auth_token, 
+            "TenantId": self.auth_tenant_id
         }
         
-        registration = requests.post(url, json=payload, headers=headers)
+        registration = requests.post(url=self.registration_url, json=payload, headers=headers)
 
         logging.warning(registration.content)
 
