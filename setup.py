@@ -19,7 +19,7 @@ setup (
 	author_email="contact@licenseware.io",
 	license='',
 	py_modules=["uploader"],
-	install_requires=[],
+	install_requires=["requests"],
 	packages=find_packages(exclude=("tests",)),
 	long_description=long_description,
     long_description_content_type="text/markdown",
